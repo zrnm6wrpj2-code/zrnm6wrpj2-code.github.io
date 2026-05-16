@@ -25,6 +25,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Verify built index (not dev template)
+        run: |
+          test -f dist/index.html
+          if grep -q 'src/main.tsx' dist/index.html; then
+            echo 'dist/index.html still references dev entry — build is wrong'
+            exit 1
+          fi
+          echo 'OK: production index references hashed bundles'
       - name: SPA fallback (React Router on GitHub Pages)
         run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
